@@ -220,7 +220,13 @@ BEGIN
   DECLARE v_change  INT;
   SELECT quantity, min_qty INTO v_current, v_min
   FROM products WHERE id=p_product_id AND is_active=1;
-  SET v_change  = IF(p_type='OUT', -p_quantity, p_quantity);
+  IF p_type = 'OUT' THEN
+    SET v_change = -p_quantity;
+  ELSEIF p_type = 'ADJUSTMENT' THEN
+    SET v_change = p_quantity - v_current;
+  ELSE
+    SET v_change = p_quantity;
+  END IF;
   SET p_new_qty = v_current + v_change;
   IF p_new_qty < 0 THEN
     SET p_error = CONCAT('Cannot reduce below zero. Current stock: ', v_current);
@@ -233,6 +239,9 @@ BEGIN
       UPDATE monitoring SET alert_status='active', alerted_at=NOW(),
              resolved_at=NULL, resolved_by=NULL
       WHERE product_id=p_product_id AND alert_status='resolved';
+    ELSE
+      UPDATE monitoring SET alert_status='resolved', resolved_at=NOW()
+      WHERE product_id=p_product_id AND alert_status='active';
     END IF;
     SET p_error = NULL;
   END IF;
