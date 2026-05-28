@@ -49,12 +49,11 @@ $prods    = mysqli_query($conn,"SELECT id,name FROM products WHERE is_active=1 O
 <div class="card" style="margin-bottom:16px">
   <div class="card-hdr"><span class="card-title">Active alerts</span><a href="search.php" class="btn btn-outline btn-sm">Search alerts &rarr;</a></div>
   <table class="tbl">
-    <thead><tr><th>Product</th><th>SKU</th><th>Current qty</th><th>Threshold</th><th>Shortfall</th><th>Triggered</th><?php if(isOwner()): ?><th>Action</th><?php endif; ?></tr></thead>
+    <thead><tr><th>Product</th><th>Current qty</th><th>Threshold</th><th>Shortfall</th><th>Triggered</th><?php if(isOwner()): ?><th>Action</th><?php endif; ?></tr></thead>
     <tbody>
     <?php $e=true; foreach($active as $al): $e=false; ?>
     <tr>
       <td class="fw"><?= h($al->getProductName()) ?></td>
-      <td class="mono muted"><?= h($al->getSku()) ?></td>
       <td class="mono <?= $al->getQtyColor() ?>"><?= $al->getCurrentQty() ?></td>
       <td class="mono"><?= $al->getThreshold() ?></td>
       <td><span class="badge b-red"><?= $al->getShortfall() ?></span></td>
@@ -62,12 +61,13 @@ $prods    = mysqli_query($conn,"SELECT id,name FROM products WHERE is_active=1 O
       <?php if(isOwner()): ?>
       <td><div style="display:flex;gap:5px;align-items:center">
         <a href="view.php?id=<?= $al->getId() ?>" class="icon-btn" title="View">&#128065;</a>
+        <a href="edit.php?id=<?= $al->getId() ?>" class="btn btn-outline btn-sm">&#9998; Edit</a>
         <form method="POST"><input type="hidden" name="resolve_id" value="<?= $al->getId() ?>">
         <button class="btn btn-success btn-sm">&#10003; Resolve</button></form>
       </div></td>
       <?php endif; ?>
     </tr>
-    <?php endforeach; if($e): ?><tr><td colspan="7" style="text-align:center;padding:30px;color:var(--t3)">&#10003; No active alerts.</td></tr><?php endif; ?>
+    <?php endforeach; if($e): ?><tr><td colspan="6" style="text-align:center;padding:30px;color:var(--t3)">&#10003; No active alerts.</td></tr><?php endif; ?>
     </tbody>
   </table>
 </div>
@@ -75,15 +75,21 @@ $prods    = mysqli_query($conn,"SELECT id,name FROM products WHERE is_active=1 O
 <div class="card">
   <div class="card-hdr"><span class="card-title">Recently resolved</span></div>
   <table class="tbl">
-    <thead><tr><th>Product</th><th>Resolved</th><th>Resolved by</th></tr></thead>
+    <thead><tr><th>Product</th><th>Resolved</th><th>Resolved by</th><?php if(isOwner()): ?><th>Action</th><?php endif; ?></tr></thead>
     <tbody>
     <?php $e=true; foreach($resolved as $al): $e=false; ?>
     <tr>
       <td class="fw"><?= h($al->getProductName()) ?></td>
       <td class="muted"><?= $al->getFormattedResolvedAt() ?></td>
       <td><?= h($al->getResolvedBy() ?: "—") ?></td>
+      <?php if(isOwner()): ?>
+      <td>
+        <a href="delete.php?id=<?= $al->getId() ?>" class="icon-btn del"
+           onclick="return confirm('Delete this alert record?')" title="Delete">&#128465;</a>
+      </td>
+      <?php endif; ?>
     </tr>
-    <?php endforeach; if($e): ?><tr><td colspan="3" style="text-align:center;padding:20px;color:var(--t3)">No resolved alerts.</td></tr><?php endif; ?>
+    <?php endforeach; if($e): ?><tr><td colspan="4" style="text-align:center;padding:20px;color:var(--t3)">No resolved alerts.</td></tr><?php endif; ?>
     </tbody>
   </table>
 </div>

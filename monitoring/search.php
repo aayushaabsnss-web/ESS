@@ -27,12 +27,11 @@ $n    = count($rows);
 <div class="card">
   <div class="card-hdr"><span class="card-title"><?= $n ?> alert<?= $n!==1?"s":"" ?> found</span></div>
   <table class="tbl">
-    <thead><tr><th>Product</th><th>SKU</th><th>Qty</th><th>Threshold</th><th>Status</th><th>Triggered</th><th>Resolved by</th><th>Actions</th></tr></thead>
+    <thead><tr><th>Product</th><th>Qty</th><th>Threshold</th><th>Status</th><th>Triggered</th><th>Resolved by</th><th>Actions</th></tr></thead>
     <tbody>
     <?php $e=true; foreach($rows as $al): $e=false; ?>
     <tr>
       <td class="fw"><?= h($al->getProductName()) ?></td>
-      <td class="mono muted"><?= h($al->getSku()) ?></td>
       <td class="mono <?= $al->getQtyColor() ?>"><?= $al->getCurrentQty() ?></td>
       <td class="mono"><?= $al->getThreshold() ?></td>
       <td><span class="badge <?= $al->isActive()?"b-red":"b-green" ?>"><?= ucfirst($al->getStatus()) ?></span></td>
@@ -40,6 +39,9 @@ $n    = count($rows);
       <td><?= h($al->getResolvedBy() ?: "—") ?></td>
       <td><div style="display:flex;gap:5px">
         <a href="view.php?id=<?= $al->getId() ?>" class="icon-btn" title="View">&#128065;</a>
+        <?php if(isOwner()): ?>
+        <a href="edit.php?id=<?= $al->getId() ?>" class="btn btn-outline btn-sm">&#9998; Edit</a>
+        <?php endif; ?>
         <?php if(isOwner() && !$al->isActive()): ?>
         <a href="delete.php?id=<?= $al->getId() ?>" class="icon-btn del"
            onclick="return confirm('Delete this alert record?')" title="Delete">&#128465;</a>
@@ -47,7 +49,7 @@ $n    = count($rows);
       </div></td>
     </tr>
     <?php endforeach; if($e): ?>
-    <tr><td colspan="8" style="text-align:center;padding:30px;color:var(--t3)">No alerts found.</td></tr>
+    <tr><td colspan="7" style="text-align:center;padding:30px;color:var(--t3)">No alerts found.</td></tr>
     <?php endif; ?>
     </tbody>
   </table>

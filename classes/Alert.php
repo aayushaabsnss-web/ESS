@@ -111,10 +111,13 @@ class Alert {
         return $row ? new self($row) : null;
     }
 
-    /** Searches alerts by product name and optional status filter */
+    /** Searches alerts by product name with optional status filter */
     public static function search(mysqli $conn, ?string $q, ?string $status): array {
         $where = ["1=1"];
-        if ($q)      $where[] = "p.name LIKE '%".mysqli_real_escape_string($conn,$q)."%'";
+        if ($q) {
+            $safe    = mysqli_real_escape_string($conn, $q);
+            $where[] = "p.name LIKE '%$safe%'";
+        }
         if ($status) $where[] = "m.alert_status='".mysqli_real_escape_string($conn,$status)."'";
         $sql = "SELECT m.*, p.name product_name, p.sku, p.quantity current_qty,
                        u.full_name resolved_by_name
