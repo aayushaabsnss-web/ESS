@@ -5,7 +5,7 @@
  */
 $t = "Stock Management"; $a = "stock";
 require_once "../includes/header.php";
-require_once "../classes/Product.php";
+require_once "../classes/Product.php"; 
 include  "../includes/flash.php";
 
 $q = trim($_GET["q"] ?? ""); $cat = $_GET["cat"] ?? ""; $status = $_GET["status"] ?? "";

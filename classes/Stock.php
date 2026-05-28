@@ -46,7 +46,8 @@ class Stock {
     // ── Business logic methods ────────────────────────────────
     /** Returns the quantity with + or - sign */
     public function getSignedQuantity(): string {
-        return ($this->quantity > 0 ? '+' : '') . $this->quantity;
+        $sign = $this->type === 'OUT' ? '-' : '+';
+return $sign . $this->quantity;
     }
 
     /** Returns the badge CSS class for the transaction type */
@@ -149,7 +150,9 @@ class Stock {
     public static function deleteById(mysqli $conn, int $id): bool {
         $tx = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM stock_movements WHERE id=$id"));
         if ($tx) {
-            $reverse = -$tx['quantity'];
+            if ($tx['type'] === 'OUT')        { $reverse = +$tx['quantity']; }
+            elseif ($tx['type'] === 'IN')     { $reverse = -$tx['quantity']; }
+            else                              { $reverse = 0; }
             mysqli_query($conn, "UPDATE products SET quantity=quantity+($reverse) WHERE id={$tx['product_id']}");
             mysqli_query($conn, "DELETE FROM stock_movements WHERE id=$id");
             return true;

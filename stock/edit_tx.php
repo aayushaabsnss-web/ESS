@@ -23,7 +23,7 @@ if($_SERVER["REQUEST_METHOD"]==="POST"){
     header("Location: view.php?id=$pid"); exit;
 }
 $tc=["IN"=>"b-green","OUT"=>"b-red","ADJUSTMENT"=>"b-amber"];
-$sign=$tx["quantity"]>0?"+":"";
+$sign = $tx["type"] === "OUT" ? "-" : "+";
 ?>
 <div class="page-hdr">
   <a href="view.php?id=<?= $pid ?>" class="btn btn-outline btn-sm">&larr; Back</a>

@@ -226,7 +226,7 @@ BEGIN
     SET p_error = CONCAT('Cannot reduce below zero. Current stock: ', v_current);
   ELSE
     INSERT INTO stock_movements (product_id,type,quantity,moved_by,notes)
-    VALUES (p_product_id,p_type,v_change,p_moved_by,p_notes);
+    VALUES (p_product_id,p_type, ABS(v_change),p_moved_by,p_notes);
     UPDATE products SET quantity=p_new_qty WHERE id=p_product_id;
     IF p_new_qty <= v_min THEN
       INSERT IGNORE INTO monitoring (product_id,threshold) VALUES (p_product_id,v_min);
@@ -378,15 +378,15 @@ INSERT INTO products (name,sku,category,description,price,quantity,min_qty,suppl
 -- =====================================================
 INSERT INTO stock_movements (product_id,type,quantity,moved_by,notes,created_at) VALUES
 (1,'IN', 30, 1,'Initial delivery batch #001','2025-09-01 09:00:00'),
-(1,'OUT',-6, 2,'Store sales week 1',         '2025-09-07 14:30:00'),
+(1,'OUT', 6, 2,'Store sales week 1',         '2025-09-07 14:30:00'),
 (2,'IN', 20, 1,'Initial delivery batch #001','2025-09-01 09:00:00'),
-(2,'OUT',-2, 2,'Store sales',                '2025-09-10 11:00:00'),
+(2,'OUT', 2, 2,'Store sales',                '2025-09-10 11:00:00'),
 (5,'IN',  8, 1,'Delivery batch #002',        '2025-09-05 10:00:00'),
-(5,'OUT',-2, 2,'Corporate sale',             '2025-09-12 15:00:00'),
+(5,'OUT', 2, 2,'Corporate sale',             '2025-09-12 15:00:00'),
 (16,'IN',10, 1,'Initial delivery',           '2025-09-01 09:00:00'),
-(16,'OUT',-8,2,'High demand weekend sales',  '2025-09-14 16:00:00'),
-(20,'IN',20, 1,'Initial delivery',           '2025-09-01 09:00:00'),
-(20,'OUT',-16,2,'Bundle sales with iPhones', '2025-09-13 12:00:00');
+(16,'OUT', 8,2,'High demand weekend sales',  '2025-09-14 16:00:00'),
+(20,'IN', 20, 1,'Initial delivery',           '2025-09-01 09:00:00'),
+(20,'OUT',16,2,'Bundle sales with iPhones', '2025-09-13 12:00:00');
 
 -- =====================================================
 --  SEED: Low-stock alerts
