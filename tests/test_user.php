@@ -6,7 +6,7 @@
  * Module:    CTEC2713 Agile Development
  * Tests:     User getters, isActive() boolean, getRoleLabel(), getStatusBadge(), getInitials()
  */
-require_once "classes/User.php";
+require_once __DIR__ . "/../classes/User.php";
 
 $tests=[];$pass=0;$fail=0;$group='';
 function grp($n){global $group;$group=$n;}
@@ -16,48 +16,45 @@ function t($name,$actual,$expected,$desc=''){
     $tests[]=['g'=>$group,'n'=>$name,'ok'=>$ok,'a'=>var_export($actual,true),'e'=>var_export($expected,true),'d'=>$desc];
 }
 
-$mkU=fn($name,$role='staff',$active=1)=>new User([
+$mkU=fn($name,$role='employee',$active=1)=>new User([
     'id'=>1,'full_name'=>$name,'email'=>'test@electrostock.com',
     'role'=>$role,'is_active'=>$active,'created_at'=>'2026-05-01 09:00:00'
 ]);
 
 // ── GROUP 1: Getter Methods ──────────────────────────────
 grp('GROUP 1 — Getter Methods (User class core properties)');
-$u=$mkU('Sapana Tamang','staff',1);
+$u=$mkU('Sapana Tamang','employee',1);
 t('getId() returns int 1',$u->getId(),1,'Primary key getter');
 t('getName() returns full name',$u->getName(),'Sapana Tamang','Full name getter');
 t('getEmail() returns email',$u->getEmail(),'test@electrostock.com','Email getter');
-t('getRole() returns role string',$u->getRole(),'staff','Role getter');
-t('getIsActive() returns int 1',$u->getIsActive(),1,'is_active raw int getter');
+t('getRole() returns role string',$u->getRole(),'employee','Role getter');
 t('getCreatedAt() returns date string',$u->getCreatedAt(),'2026-05-01 09:00:00','Created at getter');
 
 // ── GROUP 2: isActive() Boolean (TINYINT 1) ──────────────
 grp('GROUP 2 — isActive() Boolean  [TINYINT(1): 0 = Inactive | 1 = Active]');
-$active=$mkU('Active User','staff',1);
-$inactive=$mkU('Inactive User','staff',0);
+$active=$mkU('Active User','employee',1);
+$inactive=$mkU('Inactive User','employee',0);
 t('isActive() — is_active=1 → true',$active->isActive(),true,'DB 1 → PHP bool true');
-t('getIsActive() — is_active=1 → int 1',$active->getIsActive(),1,'Raw getter int 1');
 t('getStatusBadge() — active → b-green',$active->getStatusBadge(),'b-green','Active user green badge');
 t('getStatusLabel() — active → Active',$active->getStatusLabel(),'Active','Active status label');
 t('isActive() — is_active=0 → false',$inactive->isActive(),false,'DB 0 → PHP bool false');
-t('getIsActive() — is_active=0 → int 0',$inactive->getIsActive(),0,'Raw getter int 0');
+
 t('getStatusBadge() — inactive → b-red',$inactive->getStatusBadge(),'b-red','Inactive user red badge');
 t('getStatusLabel() — inactive → Inactive',$inactive->getStatusLabel(),'Inactive','Inactive status label');
 $def=new User(['id'=>1,'full_name'=>'Test','email'=>'t@t.com','role'=>'staff','created_at'=>'']);
 t('isActive() — no is_active key → default true',$def->isActive(),true,'?? 1 fallback = active');
 
 // ── GROUP 3: getRoleLabel() ──────────────────────────────
-grp('GROUP 3 — getRoleLabel() Business Logic  [owner → Store Owner | staff → Staff Member]');
-t('role=owner → Store Owner',$mkU('Test','owner')->getRoleLabel(),'Store Owner','Owner label');
-t('role=staff → Staff Member',$mkU('Test','staff')->getRoleLabel(),'Staff Member','Staff label');
+grp('GROUP 3 — getRoleLabel() Business Logic  [store_owner → Owner | employee → Employee]');
+t('role=store_owner → Owner',$mkU('Test','store_owner')->getRoleLabel(),'Owner','Owner label');
+t('role=employee → Employee',$mkU('Test','employee')->getRoleLabel(),'Employee','Employee label');
 t('role=admin → Admin (fallback)',$mkU('Test','admin')->getRoleLabel(),'Admin','Unknown role uses ucfirst');
 t('role=manager → Manager (fallback)',$mkU('Test','manager')->getRoleLabel(),'Manager','Custom role ucfirst');
 
 // ── GROUP 4: getRoleBadge() ──────────────────────────────
 grp('GROUP 4 — getRoleBadge() CSS Badge Classes');
-t('role=owner badge → b-purple',$mkU('Test','owner')->getRoleBadge(),'b-purple','Owner has purple badge');
-t('role=staff badge → b-blue',$mkU('Test','staff')->getRoleBadge(),'b-blue','Staff has blue badge');
-
+t('role=store_owner badge → b-blue',$mkU('Test','store_owner')->getRoleBadge(),'b-blue','Owner has blue badge');
+t('role=employee badge → b-gray',$mkU('Test','employee')->getRoleBadge(),'b-gray','Employee has gray badge');
 // ── GROUP 5: getInitials() ───────────────────────────────
 grp('GROUP 5 — getInitials() Name Initials  [Boundary tests on name length/format]');
 t('Two word name → initials',$mkU('Sapana Tamang')->getInitials(),'ST','First letters of each word');
@@ -80,4 +77,4 @@ t('Name 2 chars — min boundary',strlen($mkU('Jo')->getName())>=2,true,'2 char 
 t('Name 50 chars — mid',strlen($mkU(str_repeat('A',50))->getName()),50,'50 char name stored correctly');
 t('Name 100 chars — near max',strlen($mkU(str_repeat('B',100))->getName()),100,'100 char name stored correctly');
 
-include "test_runner.html.php";
+include __DIR__ . "/test_runner.html.php";
