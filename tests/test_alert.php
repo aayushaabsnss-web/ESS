@@ -6,7 +6,7 @@
  * Module:    CTEC2713 Agile Development
  * Tests:     Alert getters, isActive() boolean, getShortfall(), threshold boundary tests
  */
-require_once "classes/Alert.php";
+require_once "../classes/Alert.php";
 
 $tests=[];$pass=0;$fail=0;$group='';
 function grp($n){global $group;$group=$n;}
@@ -82,4 +82,4 @@ $aa=$mkA(3,10,'active');
 t('getFormattedResolvedAt() — not resolved → —',$aa->getFormattedResolvedAt(),'—','Unresolved = em dash');
 t('getResolvedBy() — active alert → empty',$aa->getResolvedByName(),'','No resolver for active alert');
 
-include "test_runner.html.php";
+include "test_runner.php";
